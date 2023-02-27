@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         getData();
     }
-
+    //New things added
     private void getData() {
         FirebaseFirestore
                 .getInstance()
