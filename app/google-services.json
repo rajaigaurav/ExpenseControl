@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1095622611095",
+    "project_id": "expensecontrol-3d47f",
+    "storage_bucket": "expensecontrol-3d47f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1095622611095:android:f4d90d7e62d39e0cc859d2",
+        "android_client_info": {
+          "package_name": "com.example.expensecontrol"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1095622611095-4d1fverkar76qu14cjembdj12kkoat0h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA8Mj817sC8OLT2FDmSQdGe1I3VjIbaups"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1095622611095-4d1fverkar76qu14cjembdj12kkoat0h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
