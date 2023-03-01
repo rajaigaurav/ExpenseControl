@@ -16,14 +16,13 @@
             android:layout_width="371dp"
             android:layout_height="265dp"
             android:layout_margin="5dp">
+            <com.github.mikephil.charting.charts.PieChart
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/piechart">
+            </com.github.mikephil.charting.charts.PieChart>
 
-            <TextView
 
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="Graph"
-                android:textSize="24sp" />
 
         </androidx.cardview.widget.CardView>
 

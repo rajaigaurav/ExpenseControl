@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,29 +21,33 @@ import android.widget.Toast;
 import com.example.expensecontrol.databinding.ActivityMainBinding;
 
 
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentChange;
+
 
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
+
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
+
 import com.google.firebase.firestore.QuerySnapshot;
 
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnItemsCLick{
     ActivityMainBinding binding;
     ExpensesAdapter expensesAdapter;
     RecyclerView recyclerView;
     List<ExpenseModel> expenseModelList;
     FirebaseFirestore db;
+    Intent intent;
+    long income=0, expense=0;
 
     ProgressDialog progressDialog;
 
@@ -53,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        expensesAdapter = new ExpensesAdapter(MainActivity.this, expenseModelList);
+        expensesAdapter = new ExpensesAdapter((Context) MainActivity.this,this);
 
 
         progressDialog = new ProgressDialog(this);
@@ -66,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
         expenseModelList = new ArrayList<>();
-        expensesAdapter = new ExpensesAdapter(MainActivity.this, expenseModelList);
+        expensesAdapter = new ExpensesAdapter((Context) MainActivity.this, this);
 
 
 
@@ -76,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        Intent intent = new Intent(MainActivity.this, AddExpenseActivity.class);
+        intent = new Intent(MainActivity.this, AddExpenseActivity.class);
 
 
         binding.addIncome.setOnClickListener(new View.OnClickListener() {
@@ -129,6 +134,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        income=0;
+        expense=0;
         getData();
     }
     //New things added
@@ -145,9 +152,54 @@ public class MainActivity extends AppCompatActivity {
                         List<DocumentSnapshot> dsList = queryDocumentSnapshots.getDocuments();
                         for (DocumentSnapshot ds:dsList) {
                             ExpenseModel expenseModel = ds.toObject(ExpenseModel.class);
+                            if (expenseModel.getType().equals("Income")){
+                                income+= expenseModel.getAmount();
+                            }
+                            else{
+                                 expense = expenseModel.getAmount();
+                            }
+
                             expensesAdapter.add(expenseModel);
                         }
+
+                        setUpGraph();
+
+
+
                     }
                 });
+    }
+
+    private void setUpGraph() {
+        List<PieEntry> pieEntryList= new ArrayList<>();
+        List<Integer> colorList= new ArrayList<>();
+
+        if (income!=0){
+            pieEntryList.add(new PieEntry(income, "Income"));
+            colorList.add(getResources().getColor(R.color.teal_700));
+
+        }
+        if (expense!=0){
+            pieEntryList.add(new PieEntry(income, "Expense"));
+            colorList.add(getResources().getColor(R.color.orange123));
+
+        }
+
+        PieDataSet pieDataSet = new PieDataSet(pieEntryList,String.valueOf(income-expense));
+        pieDataSet.setColors(colorList);
+        pieDataSet.setValueTextColor(getResources().getColor(R.color.white));
+        PieData pieData = new PieData(pieDataSet);
+
+        binding.piechart.setData(pieData);
+        binding.piechart.invalidate();
+
+    }
+
+
+    @Override
+    public void onClick(ExpenseModel expenseModel) {
+        intent.putExtra("model",expenseModel);
+        startActivity(intent);
+
     }
 }

@@ -20,6 +20,7 @@ import java.util.UUID;
 public class AddExpenseActivity extends AppCompatActivity {
     ActivityAddExpenseBinding binding;
     private String   type;
+    private ExpenseModel expenseModel;
 
 
     @Override
@@ -29,6 +30,15 @@ public class AddExpenseActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         type=getIntent().getStringExtra("type");
+        expenseModel =  (ExpenseModel ) getIntent().getSerializableExtra("model");
+
+        if (type==null){
+            type = expenseModel.getType();
+            binding.notes.setText(String.valueOf(expenseModel.getNote()));
+            binding.category.setText(String.valueOf(expenseModel.getCategory()));
+            binding.amount.setText(String.valueOf(expenseModel.getAmount()));
+         }
+
         if (type.equals("Income"))
         {
             binding.incomeRadio.setChecked(true);
@@ -55,7 +65,13 @@ public class AddExpenseActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.add_menu, menu);
+
+        if (expenseModel==null){
+            menuInflater.inflate(R.menu.add_menu, menu);
+        }
+        else {
+            menuInflater.inflate(R.menu.update_menu, menu);
+        }
         return true;
     }
 
@@ -64,13 +80,36 @@ public class AddExpenseActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id ==R.id.saveExpense){
-            createExpense();
+            if (type!=null){
+                 createExpense();
+            }
+            else {
+                  updateExpense();
+            }
             return true;
-
         }
+        if (id==R.id.deleteExpense){
+            deleteExpense();
+        }
+
         return false;
 
     }
+
+    private void deleteExpense() {
+
+        FirebaseFirestore
+                .getInstance()
+                .collection("expense")
+                .document(expenseModel.getExpenseId())
+                .delete();
+        finish();
+
+    }
+
+
+
+
 
     private void createExpense(){
         String expenseId= UUID.randomUUID().toString();
@@ -99,6 +138,36 @@ public class AddExpenseActivity extends AppCompatActivity {
                 .collection("expense")
                 .document()
                 .set(expenseModel);
+        finish();
+    }
+
+    private void updateExpense(){
+        String expenseId= expenseModel.getExpenseId();
+        String amount = binding.amount.getText().toString();
+        String notes = binding.notes.getText().toString();
+        String category = binding.category.getText().toString();
+
+
+        boolean incomeChecked = binding.incomeRadio.isChecked();
+
+        if (incomeChecked) {
+            type="Income";
+        }else {
+            type="Expense";
+        }
+
+        if (amount.trim().length()==0){
+            binding.amount.setError("Enter amount");
+            return;
+        }
+
+        ExpenseModel model= new ExpenseModel(expenseId, notes, category ,Long.parseLong(amount), expenseModel.getTime(), type, FirebaseAuth.getInstance().getUid());
+
+        FirebaseFirestore
+                .getInstance()
+                .collection("expense")
+                .document()
+                .set(model);
         finish();
     }
 }

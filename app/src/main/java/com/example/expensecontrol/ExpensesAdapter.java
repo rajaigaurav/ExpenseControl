@@ -10,15 +10,19 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ExpensesAdapter extends RecyclerView.Adapter<ExpensesAdapter.MyViewHolder> {
     protected Context context;
     protected List<ExpenseModel> list;
+    private OnItemsCLick onItemsClick;
 
-    public ExpensesAdapter(Context context, List<ExpenseModel> list) {
+
+    public ExpensesAdapter(Context context,OnItemsCLick onItemsClick ) {
         this.context = context;
-        this.list = list;
+        list = new ArrayList<>();
+        this.onItemsClick = onItemsClick;
     }
 
     @NonNull
@@ -37,10 +41,18 @@ public class ExpensesAdapter extends RecyclerView.Adapter<ExpensesAdapter.MyView
         holder.amountToDisplay.setText(String.valueOf(user.getAmount()));
         holder.categoryToDisplay.setText(user.getCategory());
 
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onItemsClick.onClick(user);
+            }
+        });
+
     }
 
     @Override
     public int getItemCount() {
+
         return list.size();
     }
 

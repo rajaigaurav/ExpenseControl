@@ -1,6 +1,8 @@
 package com.example.expensecontrol;
 
-public class ExpenseModel {
+import java.io.Serializable;
+
+public class ExpenseModel implements Serializable {
 
     private String expenseId;
     private String note;
