@@ -136,7 +136,7 @@ public class AddExpenseActivity extends AppCompatActivity {
         FirebaseFirestore
                 .getInstance()
                 .collection("expense")
-                .document()
+                .document(expenseId)
                 .set(expenseModel);
         finish();
     }
@@ -166,7 +166,7 @@ public class AddExpenseActivity extends AppCompatActivity {
         FirebaseFirestore
                 .getInstance()
                 .collection("expense")
-                .document()
+                .document(expenseId)
                 .set(model);
         finish();
     }
