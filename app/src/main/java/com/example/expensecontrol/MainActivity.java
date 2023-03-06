@@ -180,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements OnItemsCLick{
 
         }
         if (expense!=0){
-            pieEntryList.add(new PieEntry(income, "Expense"));
+            pieEntryList.add(new PieEntry(expense, "Expense"));
             colorList.add(getResources().getColor(R.color.orange123));
 
         }
