@@ -3,75 +3,56 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
     android:padding="20dp"
+    android:layout_height="match_parent"
     tools:context=".MainActivity">
-
     <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
+        android:layout_height="wrap_content">
         <androidx.cardview.widget.CardView
-            android:layout_width="371dp"
-            android:layout_height="265dp"
-            android:layout_margin="5dp">
+            android:layout_margin="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="300dp">
             <com.github.mikephil.charting.charts.PieChart
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/piechart">
-            </com.github.mikephil.charting.charts.PieChart>
-
-
-
+                android:id="@+id/pieChart"
+                android:layout_height="match_parent"/>
         </androidx.cardview.widget.CardView>
-
         <androidx.recyclerview.widget.RecyclerView
-             android:id="@+id/recyclerMain"
-
-            android:layout_width="371dp"
-            android:layout_height="531dp"
-            android:layout_alignParentEnd="true"
+            android:id="@+id/recycler"
             android:layout_marginTop="10dp"
-            android:layout_marginEnd="0dp" />
-
-    </LinearLayout>
-
-
-    <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:weightSum="2">
-
-            <TextView
-                android:id="@+id/addIncome"
-                android:background="@color/black"
-                android:textColor="@color/white"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="15dp"
-                android:layout_weight="1"
-                android:text="Income"
-                android:gravity="center">
-            </TextView>
-
-            <TextView
-                android:id="@+id/addExpense"
-                android:gravity="center"
-                android:background="@color/black"
-                android:textColor="@color/white"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="15dp"
-                android:layout_weight="1"
-                android:text="Expense">
-            </TextView>
-
-
-        </LinearLayout>
-
-
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+    <LinearLayout
+        android:weightSum="2"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/addIncome"
+            android:background="@color/black"
+            android:text="Add Income"
+            android:layout_weight="1"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:padding="15dp"
+            android:layout_marginRight="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/addExpense"
+            android:layout_marginLeft="10dp"
+            android:textColor="@color/white"
+            android:background="@color/black"
+            android:gravity="center"
+            android:text="Add Expense"
+            android:layout_weight="1"
+            android:padding="15dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
 
 
 </RelativeLayout>
