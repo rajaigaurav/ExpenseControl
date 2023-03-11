@@ -88,7 +88,7 @@ public class AddExpenseActivity extends AppCompatActivity {
     private void deleteExpense() {
         FirebaseFirestore
                 .getInstance()
-                .collection("expenses")
+                .collection("expense")
                 .document(expenseModel.getExpenseId())
                 .delete();
         finish();
@@ -117,7 +117,7 @@ public class AddExpenseActivity extends AppCompatActivity {
 
         FirebaseFirestore
                 .getInstance()
-                .collection("expenses")
+                .collection("expense")
                 .document(expenseId)
                 .set(expenseModel);
         finish();
@@ -146,7 +146,7 @@ public class AddExpenseActivity extends AppCompatActivity {
 
         FirebaseFirestore
                 .getInstance()
-                .collection("expenses")
+                .collection("expense")
                 .document(expenseId)
                 .set(model);
         finish();

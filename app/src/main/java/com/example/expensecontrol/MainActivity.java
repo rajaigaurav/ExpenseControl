@@ -2,6 +2,7 @@ package com.example.expensecontrol;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -21,16 +22,21 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements OnItemsClick{
     ActivityMainBinding binding;
     private ExpensesAdapter expensesAdapter;
     //    Intent intent;
     private long income=0,expense=0;
+    Map<String, Long> categoryExpenses = new HashMap<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,12 +99,13 @@ public class MainActivity extends AppCompatActivity implements OnItemsClick{
         super.onResume();
         income=0;expense=0;
         getData();
+        getGraphData();
     }
 
     private void getData() {
         FirebaseFirestore
                 .getInstance()
-                .collection("expenses")
+                .collection("expense")
                 .whereEqualTo("uid",FirebaseAuth.getInstance().getUid())
                 .get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -115,33 +122,59 @@ public class MainActivity extends AppCompatActivity implements OnItemsClick{
                             }
                             expensesAdapter.add(expenseModel);
                         }
-                        setUpGraph();
+
 
                     }
                 });
     }
 
-    private void setUpGraph() {
-        List<PieEntry> pieEntryList=new ArrayList<>();
-        List<Integer> colorsList=new ArrayList<>();
-        if (income!=0){
-            pieEntryList.add(new PieEntry(income,"Income"));
-            colorsList.add(getResources().getColor(R.color.teal_700));
+    private void getGraphData() {
+        FirebaseFirestore
+                .getInstance()
+                .collection("expense")
+                .whereEqualTo("uid", FirebaseAuth.getInstance().getUid())
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                        ExpenseModel expenseModel = documentSnapshot.toObject(ExpenseModel.class);
+                        String categoryInput = expenseModel.getCategory();
+                        String category = categoryInput.substring(0, 1).toUpperCase() + categoryInput.substring(1);
+
+                        long amount = expenseModel.getAmount();
+                        if (categoryExpenses.containsKey(category)) {
+                            amount += categoryExpenses.get(category);
+                        }
+                        categoryExpenses.put(category, amount);
+                    }
+                    // Display the category expenses in the pie chart
+                    setUpGraph((HashMap<String, Long>) categoryExpenses);
+                });
+    }
+
+    private void setUpGraph(HashMap<String, Long> categoryExpenses) {
+        List<PieEntry> pieEntryList = new ArrayList<>();
+        List<Integer> colorsList = new ArrayList<>();
+        int[] colors = { Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.MAGENTA };
+        int lastColorIndex = -1;
+
+        for (Map.Entry<String, Long> entry : categoryExpenses.entrySet()) {
+            String category = entry.getKey();
+            Long expense = entry.getValue();
+            if (expense != 0) {
+                pieEntryList.add(new PieEntry(expense, category));
+                lastColorIndex = (lastColorIndex + 1) % colors.length;
+                colorsList.add(colors[lastColorIndex]);
+            }
         }
-        if (expense!=0){
-            pieEntryList.add(new PieEntry(expense,"Expense"));
-            colorsList.add(getResources().getColor(R.color.orange123));
-        }
-        PieDataSet pieDataSet=new PieDataSet(pieEntryList,String.valueOf(income-expense));
+
+        PieDataSet pieDataSet = new PieDataSet(pieEntryList, "");
         pieDataSet.setColors(colorsList);
         pieDataSet.setValueTextColor(getResources().getColor(R.color.white));
-        PieData pieDat=new PieData(pieDataSet);
+        PieData pieData = new PieData(pieDataSet);
 
-
-        binding.pieChart.setData(pieDat);
+        binding.pieChart.setData(pieData);
         binding.pieChart.invalidate();
-
-
+        binding.pieChart.getLegend().setEnabled(false);
     }
 
     @Override
