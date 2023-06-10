@@ -2,7 +2,13 @@ package com.example.expensecontrol;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.AbsoluteSizeSpan;
+import android.text.style.RelativeSizeSpan;
+import android.text.style.StyleSpan;
 import android.view.View;
 import android.widget.Toast;
 
@@ -26,6 +32,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements OnItemsCLick{
@@ -53,14 +60,7 @@ public class MainActivity extends AppCompatActivity implements OnItemsCLick{
                 startActivity(intent);
             }
         });
-        binding.addExpense.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, AddExpenseActivity.class);
-                intent.putExtra("type", "Expense");
-                startActivity(intent);
-            }
-        });
+
     }
 
     @Override
@@ -177,47 +177,67 @@ public class MainActivity extends AppCompatActivity implements OnItemsCLick{
     }
 
 
-    private void setUpGraph(List<PieEntry> pieEntryList, List<Integer> colorsList) {
-        // Create a map to store the aggregated expenses by category
-        Map<String, Float> aggregatedExpenses = new HashMap<>();
+    private List<PieEntry> aggregateCategories(List<PieEntry> pieEntryList) {
+        Map<String, Float> aggregatedValues = new HashMap<>();
 
-        // Iterate over the pieEntryList and aggregate expenses by category
+        // Aggregate the values for each category
         for (PieEntry entry : pieEntryList) {
             String category = entry.getLabel();
-            float amount = entry.getValue();
+            float value = entry.getValue();
 
-            // Check if the category already exists in the map
-            if (aggregatedExpenses.containsKey(category)) {
-                // If the category exists, add the amount to the existing total
-                float totalAmount = aggregatedExpenses.get(category);
-                totalAmount += amount;
-                aggregatedExpenses.put(category, totalAmount);
+            if (aggregatedValues.containsKey(category)) {
+                // If the category already exists in the map, add the value to the existing total
+                float currentTotal = aggregatedValues.get(category);
+                aggregatedValues.put(category, currentTotal + value);
             } else {
-                // If the category doesn't exist, add it to the map with the amount
-                aggregatedExpenses.put(category, amount);
+                // If the category is new, add it to the map with the initial value
+                aggregatedValues.put(category, value);
             }
         }
 
-        // Create a new pieEntryList for the aggregated expenses
-        List<PieEntry> aggregatedPieEntryList = new ArrayList<>();
-
-        // Iterate over the aggregated expenses and create PieEntry objects
-        for (Map.Entry<String, Float> entry : aggregatedExpenses.entrySet()) {
+        // Create the aggregated pie entries
+        List<PieEntry> aggregatedPieEntries = new ArrayList<>();
+        for (Map.Entry<String, Float> entry : aggregatedValues.entrySet()) {
             String category = entry.getKey();
-            float amount = entry.getValue();
-
-            aggregatedPieEntryList.add(new PieEntry(amount, category));
+            float totalValue = entry.getValue();
+            PieEntry aggregatedEntry = new PieEntry(totalValue, category);
+            aggregatedPieEntries.add(aggregatedEntry);
         }
 
-        // Create a PieDataSet with the aggregatedPieEntryList
-        PieDataSet pieDataSet = new PieDataSet(aggregatedPieEntryList, String.valueOf(income - expense));
+        return aggregatedPieEntries;
+    }
+
+    private void setUpGraph(List<PieEntry> pieEntryList, List<Integer> colorsList) {
+        // Aggregate the categories
+        List<PieEntry> aggregatedEntries = aggregateCategories(pieEntryList);
+
+        // Create the pie data set and customize its appearance
+        PieDataSet pieDataSet = new PieDataSet(aggregatedEntries, "Total Expense");
         pieDataSet.setColors(colorsList);
         pieDataSet.setValueTextColor(getResources().getColor(R.color.white));
-        PieData pieData = new PieData(pieDataSet);
+        pieDataSet.setValueLineColor(getResources().getColor(R.color.black));
+        pieDataSet.setValueLinePart1OffsetPercentage(80f);
+        pieDataSet.setValueLinePart1Length(0.2f);
+        pieDataSet.setValueLinePart2Length(0.4f);
+        pieDataSet.setYValuePosition(PieDataSet.ValuePosition.OUTSIDE_SLICE);
+        pieDataSet.setValueLineVariableLength(true);
 
+        // Create the pie data and set it to the pie chart
+        PieData pieData = new PieData(pieDataSet);
         binding.pieChart.setData(pieData);
         binding.pieChart.invalidate();
+
+        // Calculate the total expense
+        float totalExpense = 0;
+        for (PieEntry entry : aggregatedEntries) {
+            totalExpense += entry.getValue();
+        }
+
+        // Set the total expense as the center text
+        String centerText = "Total\n Rs." + String.valueOf(totalExpense);
+        binding.pieChart.setCenterText(centerText);
     }
+
 
 
 
