@@ -9,4 +9,8 @@
     <color name="white">#FFFFFFFF</color>
     <color name="orange123">#FF5722</color>
     <color name="red">#F30505</color>
+    <color name="colorFood">#79DF13</color>
+    <color name="colorTransportation">#4CAF50</color>
+    <color name="colorUtilities">#2196F3</color>
+    <color name="colorDefault">#9E9E9E</color>
 </resources>

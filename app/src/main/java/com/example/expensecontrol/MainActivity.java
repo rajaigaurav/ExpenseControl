@@ -99,50 +99,65 @@ public class MainActivity extends AppCompatActivity implements OnItemsCLick{
         FirebaseFirestore
                 .getInstance()
                 .collection("expenses")
-                .whereEqualTo("uid",FirebaseAuth.getInstance().getUid())
+                .whereEqualTo("uid", FirebaseAuth.getInstance().getUid())
                 .get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                         expensesAdapter.clear();
-                        List<DocumentSnapshot> dsList=queryDocumentSnapshots.getDocuments();
-                        for (DocumentSnapshot ds:dsList){
-                            ExpenseModel expenseModel=ds.toObject(ExpenseModel.class);
-                            if (expenseModel.getType().equals("Income")){
-                                income+=expenseModel.getAmount();
-                            }else {
-                                expense+=expenseModel.getAmount();
-                            }
-                            expensesAdapter.add(expenseModel);
-                        }
-                        setUpGraph();
+                        List<DocumentSnapshot> dsList = queryDocumentSnapshots.getDocuments();
+                        List<PieEntry> pieEntryList = new ArrayList<>();
+                        List<Integer> colorsList = new ArrayList<>();
 
+                        for (DocumentSnapshot ds : dsList) {
+                            ExpenseModel expenseModel = ds.toObject(ExpenseModel.class);
+                            expensesAdapter.add(expenseModel);
+
+                            if (expenseModel.getType().equals("Income")) {
+                                income += expenseModel.getAmount();
+                            } else {
+                                expense += expenseModel.getAmount();
+                            }
+
+                            // Assign color based on category
+                            int color;
+                            switch (expenseModel.getCategory()) {
+                                case "Food":
+                                    color = getResources().getColor(R.color.colorFood);
+                                    break;
+                                case "Transportation":
+                                    color = getResources().getColor(R.color.colorTransportation);
+                                    break;
+                                case "Utilities":
+                                    color = getResources().getColor(R.color.colorUtilities);
+                                    break;
+                                default:
+                                    color = getResources().getColor(R.color.colorDefault);
+                                    break;
+                            }
+
+                            // Add PieEntry with assigned color
+                            pieEntryList.add(new PieEntry(expenseModel.getAmount(), expenseModel.getCategory()));
+                            colorsList.add(color);
+                        }
+
+                        expensesAdapter.notifyDataSetChanged();
+                        setUpGraph(pieEntryList, colorsList);
                     }
                 });
     }
 
-    private void setUpGraph() {
-        List<PieEntry> pieEntryList=new ArrayList<>();
-        List<Integer> colorsList=new ArrayList<>();
-        if (income!=0){
-            pieEntryList.add(new PieEntry(income,"Income"));
-            colorsList.add(getResources().getColor(R.color.teal_700));
-        }
-        if (expense!=0){
-            pieEntryList.add(new PieEntry(expense,"Expense"));
-            colorsList.add(getResources().getColor(R.color.orange123));
-        }
-        PieDataSet pieDataSet=new PieDataSet(pieEntryList,String.valueOf(income-expense));
+
+    private void setUpGraph(List<PieEntry> pieEntryList, List<Integer> colorsList) {
+        PieDataSet pieDataSet = new PieDataSet(pieEntryList, String.valueOf(income - expense));
         pieDataSet.setColors(colorsList);
         pieDataSet.setValueTextColor(getResources().getColor(R.color.white));
-        PieData pieDat=new PieData(pieDataSet);
+        PieData pieData = new PieData(pieDataSet);
 
-
-        binding.pieChart.setData(pieDat);
+        binding.pieChart.setData(pieData);
         binding.pieChart.invalidate();
-
-
     }
+
 
     @Override
     public void onClick(ExpenseModel expenseModel) {
