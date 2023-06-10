@@ -24,7 +24,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements OnItemsCLick{
     ActivityMainBinding binding;
@@ -131,6 +133,33 @@ public class MainActivity extends AppCompatActivity implements OnItemsCLick{
                                 case "Utilities":
                                     color = getResources().getColor(R.color.colorUtilities);
                                     break;
+                                case "Entertainment":
+                                    color = getResources().getColor(R.color.colorEntertainment);
+                                    break;
+                                case "Housing":
+                                    color = getResources().getColor(R.color.colorHousing);
+                                    break;
+                                case "Shopping":
+                                    color = getResources().getColor(R.color.colorShopping);
+                                    break;
+                                    case "Education":
+                                    color = getResources().getColor(R.color.colorEducation);
+                                    break;
+                                case "Healthcare":
+                                    color = getResources().getColor(R.color.colorHealthcare);
+                                    break;
+                                case "Travel":
+                                    color = getResources().getColor(R.color.colorTravel);
+                                    break;
+                                case "Personal Care":
+                                    color = getResources().getColor(R.color.colorPersonalCare);
+                                    break;
+
+
+
+
+
+
                                 default:
                                     color = getResources().getColor(R.color.colorDefault);
                                     break;
@@ -149,7 +178,39 @@ public class MainActivity extends AppCompatActivity implements OnItemsCLick{
 
 
     private void setUpGraph(List<PieEntry> pieEntryList, List<Integer> colorsList) {
-        PieDataSet pieDataSet = new PieDataSet(pieEntryList, String.valueOf(income - expense));
+        // Create a map to store the aggregated expenses by category
+        Map<String, Float> aggregatedExpenses = new HashMap<>();
+
+        // Iterate over the pieEntryList and aggregate expenses by category
+        for (PieEntry entry : pieEntryList) {
+            String category = entry.getLabel();
+            float amount = entry.getValue();
+
+            // Check if the category already exists in the map
+            if (aggregatedExpenses.containsKey(category)) {
+                // If the category exists, add the amount to the existing total
+                float totalAmount = aggregatedExpenses.get(category);
+                totalAmount += amount;
+                aggregatedExpenses.put(category, totalAmount);
+            } else {
+                // If the category doesn't exist, add it to the map with the amount
+                aggregatedExpenses.put(category, amount);
+            }
+        }
+
+        // Create a new pieEntryList for the aggregated expenses
+        List<PieEntry> aggregatedPieEntryList = new ArrayList<>();
+
+        // Iterate over the aggregated expenses and create PieEntry objects
+        for (Map.Entry<String, Float> entry : aggregatedExpenses.entrySet()) {
+            String category = entry.getKey();
+            float amount = entry.getValue();
+
+            aggregatedPieEntryList.add(new PieEntry(amount, category));
+        }
+
+        // Create a PieDataSet with the aggregatedPieEntryList
+        PieDataSet pieDataSet = new PieDataSet(aggregatedPieEntryList, String.valueOf(income - expense));
         pieDataSet.setColors(colorsList);
         pieDataSet.setValueTextColor(getResources().getColor(R.color.white));
         PieData pieData = new PieData(pieDataSet);
@@ -157,6 +218,7 @@ public class MainActivity extends AppCompatActivity implements OnItemsCLick{
         binding.pieChart.setData(pieData);
         binding.pieChart.invalidate();
     }
+
 
 
     @Override

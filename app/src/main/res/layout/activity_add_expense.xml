@@ -70,10 +70,10 @@
                     android:text="Category"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
-                <EditText
-                    android:id="@+id/category"
+                <Spinner
+                    android:id="@+id/categorySpinner"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
             </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>

@@ -13,4 +13,14 @@
     <color name="colorTransportation">#4CAF50</color>
     <color name="colorUtilities">#2196F3</color>
     <color name="colorDefault">#9E9E9E</color>
+    <color name="colorShopping">#FFD700</color>
+    <color name="colorEntertainment">#FFA07A</color>
+    <color name="colorHousing">#90EE90</color>
+    <color name="colorEducation">#FFB6C1</color>
+    <color name="colorHealthcare">#87CEFA</color>
+    <color name="colorTravel">#FFBB87</color>
+    <color name="colorPersonalCare">#FFD700</color>
+    <color name="colorCategory2">#FFA07A</color>
+    <color name="colorCategory3">#90EE90</color>
+    <color name="colorCategory4">#FFD700</color>
 </resources>

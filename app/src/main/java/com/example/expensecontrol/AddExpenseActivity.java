@@ -7,9 +7,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.example.expensecontrol.databinding.ActivityAddExpenseBinding;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -19,6 +24,8 @@ import java.util.UUID;
 public class AddExpenseActivity extends AppCompatActivity {
     ActivityAddExpenseBinding binding;
     private String type;
+    private Spinner categorySpinner;
+    private ArrayAdapter<String> categoryAdapter;
     private ExpenseModel expenseModel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,15 +33,26 @@ public class AddExpenseActivity extends AppCompatActivity {
         binding= ActivityAddExpenseBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        // Initialize category spinner and adapter
+        categorySpinner = findViewById(R.id.categorySpinner);
+        categoryAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, getResources().getStringArray(R.array.categories));
+        categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        categorySpinner.setAdapter(categoryAdapter);
+
         type=getIntent().getStringExtra("type");
         expenseModel=(ExpenseModel) getIntent().getSerializableExtra("model");
 
-        if (type==null){
-            type=expenseModel.getType();
+        if (type == null) {
+            type = expenseModel.getType();
             binding.amount.setText(String.valueOf(expenseModel.getAmount()));
-            binding.category.setText(expenseModel.getCategory());
             binding.note.setText(expenseModel.getNote());
+
+            // Set the selected category in the Spinner
+            ArrayAdapter<String> adapter = (ArrayAdapter<String>) binding.categorySpinner.getAdapter();
+            int position = adapter.getPosition(expenseModel.getCategory());
+            binding.categorySpinner.setSelection(position);
         }
+
 
         if (type.equals("Income")){
             binding.incomeRadio.setChecked(true);
@@ -99,7 +117,9 @@ public class AddExpenseActivity extends AppCompatActivity {
         String expenseId= UUID.randomUUID().toString();
         String amount=binding.amount.getText().toString();
         String note=binding.note.getText().toString();
-        String category=binding.category.getText().toString();
+        String category = binding.categorySpinner.getSelectedItem().toString();
+
+
 
         boolean incomeChecked=binding.incomeRadio.isChecked();
         if (incomeChecked){
@@ -124,32 +144,39 @@ public class AddExpenseActivity extends AppCompatActivity {
 
     }
     private void updateExpense() {
+        String expenseId = expenseModel.getExpenseId();
+        String amount = binding.amount.getText().toString();
+        String note = binding.note.getText().toString();
+        String category = binding.categorySpinner.getSelectedItem().toString();
 
-        String expenseId= expenseModel.getExpenseId();
-        String amount=binding.amount.getText().toString();
-        String note=binding.note.getText().toString();
-        String category=binding.category.getText().toString();
+        boolean incomeChecked = binding.incomeRadio.isChecked();
+        String type = incomeChecked ? "Income" : "Expense";
 
-        boolean incomeChecked=binding.incomeRadio.isChecked();
-        if (incomeChecked){
-            type="Income";
-        }else {
-            type="Expense";
-        }
-
-        if (amount.trim().length()==0){
+        if (amount.trim().length() == 0) {
             binding.amount.setError("Empty");
             return;
         }
-        ExpenseModel model=new ExpenseModel(expenseId,note,category,type,Long.parseLong(amount),expenseModel.getTime() ,
-                FirebaseAuth.getInstance().getUid());
 
-        FirebaseFirestore
-                .getInstance()
+        ExpenseModel model = new ExpenseModel(expenseId, note, category, type, Long.parseLong(amount), expenseModel.getTime(), FirebaseAuth.getInstance().getUid());
+
+        FirebaseFirestore.getInstance()
                 .collection("expenses")
                 .document(expenseId)
-                .set(model);
-        finish();
-
+                .set(model)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(AddExpenseActivity.this, "Expense updated successfully", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(AddExpenseActivity.this, "Failed to update expense: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
+
+
 }

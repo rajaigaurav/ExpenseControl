@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">ExpenseControl</string>
+
+    <string-array name="categories">
+        <item>Food</item>
+        <item>Transport</item>
+        <item>Shopping</item>
+        <item>Entertainment</item>
+        <item>Housing</item>
+        <item>Utilities</item>
+        <item>Education</item>
+        <item>Healthcare</item>
+        <item>Travel</item>
+        <item>Personal Care</item>
+        <item>Other</item>
+        <!-- Add more categories as needed -->
+    </string-array>
 </resources>
