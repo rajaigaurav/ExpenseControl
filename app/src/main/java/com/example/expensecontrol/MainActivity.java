@@ -2,13 +2,10 @@ package com.example.expensecontrol;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Typeface;
+
+import android.graphics.Color;
 import android.os.Bundle;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.AbsoluteSizeSpan;
-import android.text.style.RelativeSizeSpan;
-import android.text.style.StyleSpan;
+
 import android.view.View;
 import android.widget.Toast;
 
@@ -214,13 +211,27 @@ public class MainActivity extends AppCompatActivity implements OnItemsCLick{
         // Create the pie data set and customize its appearance
         PieDataSet pieDataSet = new PieDataSet(aggregatedEntries, "Total Expense");
         pieDataSet.setColors(colorsList);
-        pieDataSet.setValueTextColor(getResources().getColor(R.color.white));
-        pieDataSet.setValueLineColor(getResources().getColor(R.color.black));
-        pieDataSet.setValueLinePart1OffsetPercentage(80f);
-        pieDataSet.setValueLinePart1Length(0.2f);
-        pieDataSet.setValueLinePart2Length(0.4f);
-        pieDataSet.setYValuePosition(PieDataSet.ValuePosition.OUTSIDE_SLICE);
-        pieDataSet.setValueLineVariableLength(true);
+        pieDataSet.setValueTextColor(Color.WHITE);
+        pieDataSet.setDrawValues(false); // Disable drawing values
+
+        // Disable labels and legends
+        binding.pieChart.setDrawEntryLabels(true); // Enable drawing entry labels
+        binding.pieChart.getLegend().setEnabled(false);
+
+        // Customize slice separators (lines)
+        pieDataSet.setSliceSpace(1f);
+        pieDataSet.setSliceSpace(1f);
+
+
+        // Customize border colors
+        binding.pieChart.setDrawHoleEnabled(true); // Enable drawing the hole in the center
+        binding.pieChart.setHoleColor(Color.TRANSPARENT); // Set the hole color to transparent
+        binding.pieChart.setTransparentCircleColor(Color.BLACK); // Set the color of the transparent circle
+        binding.pieChart.setTransparentCircleAlpha(110); // Set the alpha value of the transparent circle
+        binding.pieChart.setTransparentCircleRadius(0f); // Disable the transparent circle
+        binding.pieChart.setDrawCenterText(true); // Enable drawing the center text
+        binding.pieChart.setCenterTextColor(Color.BLACK); // Set the color of the center text
+        binding.pieChart.setDrawEntryLabels(true); // Disable drawing entry labels
 
         // Create the pie data and set it to the pie chart
         PieData pieData = new PieData(pieDataSet);
@@ -234,8 +245,9 @@ public class MainActivity extends AppCompatActivity implements OnItemsCLick{
         }
 
         // Set the total expense as the center text
-        String centerText = "Total\n Rs." + String.valueOf(totalExpense);
+        String centerText = "Total\nRs. " + String.valueOf(totalExpense);
         binding.pieChart.setCenterText(centerText);
+        binding.pieChart.setCenterTextSize(16f);
     }
 
 

@@ -6,24 +6,28 @@
     android:padding="20dp"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
+
     <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_width="375dp"
+        android:layout_height="622dp"
+        android:orientation="vertical">
+
         <androidx.cardview.widget.CardView
-            android:layout_margin="5dp"
             android:layout_width="match_parent"
-            android:layout_height="300dp">
+            android:layout_height="300dp"
+            android:layout_margin="5dp">
+
             <com.github.mikephil.charting.charts.PieChart
-                android:layout_width="match_parent"
                 android:id="@+id/pieChart"
-                android:layout_height="match_parent"/>
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
         </androidx.cardview.widget.CardView>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler"
-            android:layout_marginTop="10dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="169dp"
+            android:layout_marginTop="10dp" />
     </LinearLayout>
     <LinearLayout
         android:weightSum="2"
