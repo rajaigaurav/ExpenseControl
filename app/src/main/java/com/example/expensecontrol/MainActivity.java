@@ -6,6 +6,10 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.TextUtils;
+import android.text.style.ForegroundColorSpan;
 import android.view.View;
 import android.widget.Toast;
 
@@ -139,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements OnItemsCLick{
                                 case "Shopping":
                                     color = getResources().getColor(R.color.colorShopping);
                                     break;
-                                    case "Education":
+                                case "Education":
                                     color = getResources().getColor(R.color.colorEducation);
                                     break;
                                 case "Healthcare":
@@ -238,14 +242,17 @@ public class MainActivity extends AppCompatActivity implements OnItemsCLick{
         binding.pieChart.setData(pieData);
         binding.pieChart.invalidate();
 
-        // Calculate the total expense
-        float totalExpense = 0;
-        for (PieEntry entry : aggregatedEntries) {
-            totalExpense += entry.getValue();
-        }
+// Set the total expense and income as the center text
+        String expenseText = "Expense\n₹ " + String.valueOf(expense);
+        String incomeText = "Income\n₹ " + String.valueOf(income);
 
-        // Set the total expense as the center text
-        String centerText = "Total\nRs. " + String.valueOf(totalExpense);
+        SpannableString spannableExpense = new SpannableString(expenseText);
+        spannableExpense.setSpan(new ForegroundColorSpan(Color.RED), 0, expenseText.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        SpannableString spannableIncome = new SpannableString(incomeText);
+        spannableIncome.setSpan(new ForegroundColorSpan(Color.GREEN), 0, incomeText.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        CharSequence centerText = TextUtils.concat(spannableExpense, "\n\n", spannableIncome);
         binding.pieChart.setCenterText(centerText);
         binding.pieChart.setCenterTextSize(16f);
     }
